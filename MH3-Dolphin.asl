@@ -1,7 +1,7 @@
-/***********************************************************************/
-/* Autosplitter for IL runs of Monster Hunter Tri (Emulated - Dolphin) */
-/* Author: Ze SpyRo                                                    */
-/***********************************************************************/
+/***************************************************************************/
+/* Autosplitter for IL/RTA runs of Monster Hunter Tri (Emulated - Dolphin) */
+/* Author: Ze SpyRo                                                        */
+/***************************************************************************/
 
 state("Dolphin") {}
 
@@ -15,7 +15,142 @@ startup {
 	vars.ConvertEndianShort = (Func<ushort, ushort>)((value) => {
 		return (ushort)((ushort)((value & 0xff) << 8) | ((value >> 8) & 0xff));
 	});
+	
+	vars.CompletedQuestsLen = 0;
+	vars.CompletedQuests = new ushort[400];
+	vars.MarkQuestCompleted = (Func<ushort, int>)((v) => {
+		vars.CompletedQuests[vars.CompletedQuestsLen] = v;
+		vars.CompletedQuestsLen = vars.CompletedQuestsLen + 1;
+		return 1;
+	});
+	vars.IsQuestCompleted = (Func<ushort, bool>)((v) => {
+		for (int i = 0; i < vars.CompletedQuestsLen; i++) {
+			if (vars.CompletedQuests[i] == v)
+				return true;
+		}
+		return false;
+	});
+	vars.ClearQuestsCompleted = (Func<int>)(() => {
+		vars.CompletedQuestsLen = 0;
+		return 1;
+	});
+	
 	settings.Add("IL", true, "Checked to configure for IL, unchecked to configure for RTA");
+	settings.Add("...", false, "--------------------VILLAGE RTA SPLITS--------------------");
+	settings.Add("1000", false, "Harvest 'Shroom");
+	settings.Add("1001", false, "Prescription Pick-up");
+	settings.Add("1002", false, "Goldenfish Opportunity");
+	settings.Add("1003", false, "Farm Aid");
+	settings.Add("1004", false, "Guts: It's What's for Dinner");
+	settings.Add("1005", false, "Sunken Treasures");
+	settings.Add("1010", false, "Bug Hunt");
+	settings.Add("1011", false, "Secret of the Crystal Bones");
+	settings.Add("1012", false, "No Guts, No Glory");
+	settings.Add("1013", false, "Big Game Hunting");
+	settings.Add("1014", false, "Who's the Boss?");
+	settings.Add("1020", false, "Rhenoplos Rampage!");
+	settings.Add("1021", false, "Herbivore Egg Hunt!");
+	settings.Add("1022", false, "Pest Control");
+	settings.Add("1023", false, "The Deadliest Catch");
+	settings.Add("1024", false, "Playing with Fire");
+	settings.Add("1025", false, "Trapping a Trickster");
+	settings.Add("1026", false, "Save Our Boat");
+	settings.Add("1027", false, "Leading the Charge");
+	settings.Add("1028", false, "A Royal Pain");
+	settings.Add("1030", false, "Lost in Blue");
+	settings.Add("1031", false, "Leader of the Icepack");
+	settings.Add("1032", false, "Cold Stones");
+	settings.Add("1033", false, "Hunter Killer");
+	settings.Add("1034", false, "Harvest Tour: Sandy Plains");
+	settings.Add("1035", false, "Harvest Tour: Flooded Forest");
+	settings.Add("1036", false, "Dragon Lady");
+	settings.Add("1037", false, "The Creeping Venom");
+	settings.Add("1038", false, "A Royal Rumble");
+	settings.Add("1039", false, "Poached Wyvern Eggs");
+	settings.Add("1040", false, "Best the Lava Beasts!");
+	settings.Add("1041", false, "Heat Exhaustion");
+	settings.Add("1042", false, "The Lord of the Seas");
+	settings.Add("1043", false, "Harvest Tour: Tundra");
+	settings.Add("1044", false, "The Wrath of Rathalos");
+	settings.Add("1045", false, "A Bard's Tale");
+	settings.Add("1046", false, "The Horned Dragon");
+	settings.Add("1047", false, "The Omen");
+	settings.Add("1048", false, "Denizen of the Molten Deep");
+	settings.Add("1049", false, "The Volcano's Fury");
+	settings.Add("1050", false, "Uragaan's Trail");
+	settings.Add("1060", false, "Mating Season");
+	settings.Add("1061", false, "Four Horns");
+	settings.Add("1062", false, "Dangerous Waters");
+	settings.Add("1063", false, "White Wind of the Tundra");
+	settings.Add("1064", false, "The Death of Sky and Sea");
+	settings.Add("1065", false, "A Burnt Offering");
+	settings.Add("2000", false, "No Love for Ludroth");
+	settings.Add("2001", false, "Shakalaka Savior!");
+	settings.Add("2002", false, "Accident Investigation");
+	settings.Add("2003", false, "Trial of the Sea Dragon");
+	settings.Add("2004", false, "Fell the Lagiacrus!");
+	settings.Add("2005", false, "Save Moga Village!");
+	settings.Add("2006", false, "The Decisive Battle");
+
+	vars.GetQuestName = (Func<ushort, string>)((v) => {
+		switch(v) {
+			case 1000: return "Harvest 'Shroom";
+			case 1001: return "Prescription Pick-up";
+			case 1002: return "Goldenfish Opportunity";
+			case 1003: return "Farm Aid";
+			case 1004: return "Guts: It's What's for Dinner";
+			case 1005: return "Sunken Treasures";
+			case 1010: return "Bug Hunt";
+			case 1011: return "Secret of the Crystal Bones";
+			case 1012: return "No Guts, No Glory";
+			case 1013: return "Big Game Hunting";
+			case 1014: return "Who's the Boss?";
+			case 1020: return "Rhenoplos Rampage!";
+			case 1021: return "Herbivore Egg Hunt!";
+			case 1022: return "Pest Control";
+			case 1023: return "The Deadliest Catch";
+			case 1024: return "Playing with Fire";
+			case 1025: return "Trapping a Trickster";
+			case 1026: return "Save Our Boat";
+			case 1027: return "Leading the Charge";
+			case 1028: return "A Royal Pain";
+			case 1030: return "Lost in Blue";
+			case 1031: return "Leader of the Icepack";
+			case 1032: return "Cold Stones";
+			case 1033: return "Hunter Killer";
+			case 1034: return "Harvest Tour: Sandy Plains";
+			case 1035: return "Harvest Tour: Flooded Forest";
+			case 1036: return "Dragon Lady";
+			case 1037: return "The Creeping Venom";
+			case 1038: return "A Royal Rumble";
+			case 1039: return "Poached Wyvern Eggs";
+			case 1040: return "Best the Lava Beasts!";
+			case 1041: return "Heat Exhaustion";
+			case 1042: return "The Lord of the Seas";
+			case 1043: return "Harvest Tour: Tundra";
+			case 1044: return "The Wrath of Rathalos";
+			case 1045: return "A Bard's Tale";
+			case 1046: return "The Horned Dragon";
+			case 1047: return "The Omen";
+			case 1048: return "Denizen of the Molten Deep";
+			case 1049: return "The Volcano's Fury";
+			case 1050: return "Uragaan's Trail";
+			case 1060: return "Mating Season";
+			case 1061: return "Four Horns";
+			case 1062: return "Dangerous Waters";
+			case 1063: return "White Wind of the Tundra";
+			case 1064: return "The Death of Sky and Sea";
+			case 1065: return "A Burnt Offering";
+			case 2000: return "No Love for Ludroth";
+			case 2001: return "Shakalaka Savior!";
+			case 2002: return "Accident Investigation";
+			case 2003: return "Trial of the Sea Dragon";
+			case 2004: return "Fell the Lagiacrus!";
+			case 2005: return "Save Moga Village!";
+			case 2006: return "The Decisive Battle";
+			default: return "Unknown";
+		}
+	});
 }
 
 init {
@@ -42,6 +177,8 @@ init {
 	vars.QuestDataPtr.Update(game);
 	vars.QuestMaxFramesPtr = new MemoryWatcher<ushort> (vars.ptr2 + (int)(vars.ConvertEndian((uint)vars.QuestDataPtr.Current)& 0xFFFFFF) + 0x013A);
 	vars.QuestMaxFramesPtr.Update(game);
+	vars.QuestIDPtr = new MemoryWatcher<ushort> (vars.ptr2 + (int)(vars.ConvertEndian((uint)vars.QuestDataPtr.Current)& 0xFFFFFF) + 0x002C);
+	vars.QuestIDPtr.Update(game);
 
 	vars.RemainingFramesPtr1 = new MemoryWatcher<uint> (vars.ptr2 + (int)((vars.ConvertEndian((vars.DeepState.Current))& 0xFFFFFF) + 0xdc));
 	vars.RemainingFramesPtr1.Update(game);
@@ -102,18 +239,22 @@ update {
 		}
 	}
 
-	// QUEST MAX FRAMES
+	// QUEST MAX FRAMES AND ID
 	bool questDataUpdated = vars.QuestDataPtr.Update(game);
 	if (vars.QuestDataPtr.Current > 0x00) {
-		if (questDataUpdated)
+		if (questDataUpdated) {
 			vars.QuestMaxFramesPtr = new MemoryWatcher<ushort> (vars.ptr2 + (int)(vars.ConvertEndian((uint)vars.QuestDataPtr.Current)& 0xFFFFFF) + 0x013A);
+			vars.QuestIDPtr = new MemoryWatcher<ushort> (vars.ptr2 + (int)(vars.ConvertEndian((uint)vars.QuestDataPtr.Current)& 0xFFFFFF) + 0x002C);
+		}
 		vars.QuestMaxFramesPtr.Update(game);
+		vars.QuestIDPtr.Update(game);
 	}
 
 	vars.QuestEnded.Update(game);
 
 	vars.questMaxFrames = vars.ConvertEndianShort((ushort)vars.QuestMaxFramesPtr.Current) * 60 * 30;
 	vars.questRemainingFrames = vars.ConvertEndian((uint)vars.RemainingFramesPtr2.Current);
+	vars.questID = vars.ConvertEndianShort((ushort)vars.QuestIDPtr.Current);
 
 	/*
 	print(vars.questRemainingFrames.ToString() + " / " + vars.questMaxFrames.ToString());
@@ -158,11 +299,14 @@ onStart {
 }
 
 onSplit {
-	print("SPLITTING!");
+	print("SPLITTING QUEST " + vars.GetQuestName(vars.questID) + "!");
+	if (!settings["IL"])
+		vars.MarkQuestCompleted(vars.questID);
 }
 
 onReset {
 	print("RESETTING");
+	vars.ClearQuestsCompleted();
 }
 
 gameTime {
@@ -185,6 +329,8 @@ start {
 split {
 	if (settings["IL"])
 		return (vars.questInProgress) && (vars.QuestEnded.Current > 0);
+	else
+		return (vars.questInProgress) && (vars.QuestEnded.Current > 0) && (settings[vars.questID.ToString()]) && (!vars.IsQuestCompleted(vars.questID));
 }
 
 reset {
