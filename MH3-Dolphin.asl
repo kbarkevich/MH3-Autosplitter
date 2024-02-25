@@ -206,6 +206,7 @@ init {
 	vars.Exx4 = new MemoryWatcher<uint> (vars.ptr + 0x66acc8);
 	vars.Exx5 = new MemoryWatcher<uint> (vars.ptr + 0x66acd8);
 	vars.Exx6 = new MemoryWatcher<uint> (vars.ptr + 0x66ace8);
+	vars.isNotLoading = "1";
 }
 
 update {
@@ -283,7 +284,8 @@ update {
 	vars.up = vars.up || vars.PlayMode_ck.Update(game);
 	vars.up = vars.up || vars.GameModeState.Update(game);
 	vars.up = vars.up || vars.PlayMode_ck2.Update(game);
-	vars.isNotLoading = vars.Exx1.Current | vars.Exx2.Current | vars.Exx3.Current | vars.Exx4.Current | vars.Exx5.Current | vars.Exx6.Current;
+	vars.prevLoading = vars.isNotLoading;
+	vars.isNotLoading = (vars.Exx1.Current | vars.Exx2.Current | vars.Exx3.Current | vars.Exx4.Current | vars.Exx5.Current | vars.Exx6.Current).ToString("X");
 	if (false && vars.up) {
 		print(" ");
 		print(vars.GameModeState.Current.ToString("X") + " " + vars.PlayMode_ck.Current.ToString("X") + " " + vars.PlayMode_ck2.Current.ToString("X"));
@@ -318,12 +320,21 @@ gameTime {
 
 isLoading {
 	if (!settings["IL"])
-		return vars.isNotLoading == 0x00000000;
+		return vars.isNotLoading == "0";
 }
 
 start {
 	if (settings["IL"])
 		return vars.questInProgress && (vars.QuestEnded.Current == 0);
+	else {
+		if (vars.isNotLoading == "FFFFFFFF") {
+			var scanner = new SignatureScanner(game, vars.ptr + 0x6a0000, 0x2000);
+			var ptr = scanner.Scan(new SigScanTarget(0, "00 00 10 69 00 00 00 00 00 00 00 00 12"), 0x1);
+			return (ptr != IntPtr.Zero);
+		}
+		return false;
+		
+	}
 }
 
 split {
