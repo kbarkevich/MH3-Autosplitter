@@ -307,6 +307,10 @@ init {
 	vars.Exx5 = new MemoryWatcher<uint> (vars.ptr + 0x66acd8);
 	vars.Exx6 = new MemoryWatcher<uint> (vars.ptr + 0x66ace8);
 	vars.isNotLoading = "1";
+	
+	var scanner = new SignatureScanner(game, vars.ptr + 0x6a0000, 0x2000);
+	var ptr = scanner.ScanAll(new SigScanTarget(0, "00 00 10 69 00 00 00 00 00 00 00 00 12"), 0x1).ToArray();
+	vars.PreviousMusicStarts = ptr.Length;
 }
 
 update {
@@ -384,7 +388,6 @@ update {
 	vars.up = vars.up || vars.PlayMode_ck.Update(game);
 	vars.up = vars.up || vars.GameModeState.Update(game);
 	vars.up = vars.up || vars.PlayMode_ck2.Update(game);
-	vars.prevLoading = vars.isNotLoading;
 	vars.isNotLoading = (vars.Exx1.Current | vars.Exx2.Current | vars.Exx3.Current | vars.Exx4.Current | vars.Exx5.Current | vars.Exx6.Current).ToString("X");
 	if (false && vars.up) {
 		print(" ");
@@ -429,11 +432,13 @@ start {
 	else {
 		if (vars.isNotLoading == "FFFFFFFF") {
 			var scanner = new SignatureScanner(game, vars.ptr + 0x6a0000, 0x2000);
-			var ptr = scanner.Scan(new SigScanTarget(0, "00 00 10 69 00 00 00 00 00 00 00 00 12"), 0x1);
-			return (ptr != IntPtr.Zero);
+			var ptr = scanner.ScanAll(new SigScanTarget(0, "00 00 10 69 00 00 00 00 00 00 00 00 12"), 0x1).ToArray();
+			var result = ptr.Length;
+			var returning = result > vars.PreviousMusicStarts;
+			vars.PreviousMusicStarts = result;
+			return returning;
 		}
 		return false;
-		
 	}
 }
 
