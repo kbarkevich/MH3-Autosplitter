@@ -411,6 +411,9 @@ init {
 	var scanner = new SignatureScanner(game, vars.ptr + 0x6a0000, 0x2000);
 	var ptr = scanner.ScanAll(new SigScanTarget(0, "00 00 10 69 00 00 00 00 00 00 00 00 12"), 0x1).ToArray();
 	vars.PreviousMusicStarts = ptr.Length;
+	
+	vars.AudioReadLocation = new MemoryWatcher<uint> (vars.ptr + 0x694cb0);
+	vars.AudioReadLocation.Update(game);
 }
 
 update {
@@ -497,6 +500,12 @@ update {
 		print(vars.Exx1.Current.ToString("X") + " " + vars.Exx2.Current.ToString("X") + " " + vars.Exx3.Current.ToString("X") + " " + vars.Exx4.Current.ToString("X") +
 			 " " + vars.Exx5.Current.ToString("X") + " " + vars.Exx6.Current.ToString("X"));
 	}
+	
+	// Waiting for the quest completed stamp audio
+	vars.AudioReadLocation.Update(game);
+	var scanner = new SignatureScanner(game, vars.ptr2 + (int)(vars.ConvertEndian(vars.AudioReadLocation.Current)-0x90000000), 0x1000);
+	var ptr = scanner.ScanAll(new SigScanTarget(0, "51 55 45 53 54 5F 45"), 0x1).ToArray();
+	vars.QuestCompleteStampAudioHits = ptr.Length;
 }
 
 onStart {
@@ -546,7 +555,7 @@ split {
 	if (settings["IL"])
 		return (vars.questInProgress) && (vars.QuestEnded.Current > 0);
 	else
-		return (vars.questInProgress) && (vars.QuestEnded.Current > 0) && (settings[vars.questID.ToString()]) && (!vars.IsQuestCompleted(vars.questID));
+		return (vars.QuestEnded.Current > 0) && (vars.QuestCompleteStampAudioHits > 0) && (settings[vars.questID.ToString()]) && (!vars.IsQuestCompleted(vars.questID));
 }
 
 reset {
