@@ -373,6 +373,9 @@ init {
 	vars.DeeperState = new MemoryWatcher<byte> (vars.ptr2 + (int)((vars.ConvertEndian((vars.DeepState.Current))& 0xFFFFFF)));
 	vars.DeeperState.Update(game);
 
+	vars.PlayTimePtr = new MemoryWatcher<uint> (vars.ptr + 0x658e70);
+	vars.PlayTimePtr.Update(game);
+
 	vars.QuestDataPtr = new MemoryWatcher<uint> (vars.ptr + 0x6c5894);
 	vars.QuestDataPtr.Update(game);
 	vars.QuestMaxFramesPtr = new MemoryWatcher<ushort> (vars.ptr2 + (int)(vars.ConvertEndian((uint)vars.QuestDataPtr.Current)& 0xFFFFFF) + 0x013A);
@@ -464,13 +467,8 @@ update {
 	vars.questRemainingFrames = vars.ConvertEndian((uint)vars.RemainingFramesPtr2.Current);
 	vars.questID = vars.ConvertEndianShort((ushort)vars.QuestIDPtr.Current);
 
-	/*
-	print(vars.questRemainingFrames.ToString() + " / " + vars.questMaxFrames.ToString());
-	print(vars.ConvertEndian(vars.State.Current).ToString("X") + "  " + 
-		vars.ConvertEndian(vars.DeepState.Current).ToString("X") + "  " + 
-		vars.ConvertEndian(vars.DeeperState.Current).ToString("X"));
-	print("");
-	*/
+	vars.PlayTimePtr.Update(game);
+	vars.playTimeSeconds = vars.ConvertEndian((uint)vars.PlayTimePtr.Current);
 
 	//print(vars.Ex1.Current.ToString("X") + " " + vars.Ex2.Current.ToString("X") + " " + vars.Ex3.Current.ToString("X") + " " + vars.Ex4.Current.ToString("X") +
 	//	 " " + vars.Ex5.Current.ToString("X") + " " + vars.Ex6.Current.ToString("X") + " " + vars.Ex7.Current.ToString("X") + " " + vars.Ex8.Current.ToString("X"));
@@ -524,10 +522,15 @@ onReset {
 }
 
 gameTime {
+	// The in-game time is tracked somewhere to be saved to the save file as total time played --
+	//	maybe it can be read here for RTA (found it, it's at 0x80658e70)
 	if (settings["IL"]) {
 		float secs = (vars.questMaxFrames - vars.questRemainingFrames) / 30.0f;
 		return TimeSpan.FromSeconds(secs);
-	}
+	}// else {
+	//	float secs = vars.playTimeSeconds;
+	//	return TimeSpan.FromSeconds(secs);
+	//}
 }
 
 isLoading {
